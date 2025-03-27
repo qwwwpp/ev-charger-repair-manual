@@ -9,7 +9,7 @@ import { useAppContext } from "@/lib/context";
 import { ErrorCode, ErrorTypeStats } from "@/lib/types";
 
 const Home = () => {
-  const { translate, selectedErrorType, searchQuery } = useAppContext();
+  const { translate, selectedErrorType, setSelectedErrorType, searchQuery, setSearchQuery } = useAppContext();
   const [showSidebar, setShowSidebar] = useState(false);
   const [filteredErrors, setFilteredErrors] = useState<ErrorCode[]>([]);
 
@@ -53,7 +53,8 @@ const Home = () => {
   }, [errorCodes, selectedErrorType, searchQuery]);
 
   const handleSearch = (query: string) => {
-    // This is handled by the context
+    setSearchQuery(query);
+    setSelectedErrorType('all'); // Reset error type filter when searching
   };
 
   const toggleSidebar = () => {
@@ -125,6 +126,8 @@ const Home = () => {
               <button 
                 onClick={() => {
                   // Reset filters and search
+                  setSearchQuery('');
+                  setSelectedErrorType('all');
                 }}
                 className="mt-4 inline-flex items-center px-4 py-2 border border-primary-500 text-primary-600 bg-white rounded-md hover:bg-primary-50 text-sm font-medium"
               >

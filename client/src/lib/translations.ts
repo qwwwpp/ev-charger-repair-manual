@@ -23,6 +23,7 @@ interface TranslationMap {
   no_results: string;
   try_different: string;
   view_all: string;
+  view_details: string;
   home: string;
   search: string;
   favorites: string;
@@ -61,6 +62,7 @@ export const translations: Translations = {
     no_results: '未找到匹配结果',
     try_different: '请尝试使用不同的搜索词或浏览所有故障码分类。',
     view_all: '查看所有故障码',
+    view_details: '详细',
     home: '首页',
     search: '搜索',
     favorites: '收藏',
@@ -90,6 +92,7 @@ export const translations: Translations = {
     no_results: 'No Results Found',
     try_different: 'Please try different keywords or browse all error codes.',
     view_all: 'View All Error Codes',
+    view_details: 'Details',
     home: 'Home',
     search: 'Search',
     favorites: 'Favorites',
