@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAppContext } from "@/lib/context";
 
 interface SearchBarProps {
@@ -7,11 +7,13 @@ interface SearchBarProps {
 
 const SearchBar = ({ onSearch }: SearchBarProps) => {
   const { translate, searchQuery, setSearchQuery } = useAppContext();
-  const [quickSearches, setQuickSearches] = useState<string[]>(['3009', '过温', '急停', '通讯故障']);
+  const [quickSearches] = useState<string[]>(['3009', '过温', '急停', '通讯故障']);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    onSearch(e.target.value);
+    const value = e.target.value;
+    console.log('Search input value:', value);
+    setSearchQuery(value);
+    onSearch(value);
   };
 
   const clearSearch = () => {

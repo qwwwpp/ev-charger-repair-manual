@@ -77,6 +77,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   );
 };
 
-export const useAppContext = (): AppContextType => {
-  return useContext(AppContext);
-};
+export function useAppContext(): AppContextType {
+  const context = useContext(AppContext);
+  if (context === undefined) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
+}
