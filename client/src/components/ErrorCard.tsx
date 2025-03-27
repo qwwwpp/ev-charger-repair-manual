@@ -90,12 +90,6 @@ const ErrorCard = ({ error, isExpanded = false }: ErrorCardProps) => {
           <span className="text-sm text-gray-500 mr-3">
             {translate('cause')}: {error.cause || '-'}
           </span>
-          <Link href={`/error/${error.code}`} className="mr-2 px-2 py-1 bg-primary-50 text-primary-600 rounded-md text-sm hover:bg-primary-100" onClick={(e) => e.stopPropagation()}>
-            <span className="flex items-center">
-              <span className="material-icons text-sm mr-1">info</span>
-              {translate('view_details')}
-            </span>
-          </Link>
           <span className={`material-icons text-gray-400 ${expanded ? 'transform rotate-180' : ''}`}>
             expand_more
           </span>
