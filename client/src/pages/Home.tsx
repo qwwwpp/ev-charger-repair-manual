@@ -9,7 +9,8 @@ import { useAppContext } from "@/lib/context";
 import { ErrorCode, ErrorTypeStats } from "@/lib/types";
 
 const Home = () => {
-  const { translate, selectedErrorType, searchQuery } = useAppContext();
+  const { translate, selectedErrorType, setSearchQuery } = useAppContext();
+  const [localSearchQuery, setLocalSearchQuery] = useState('');
   const [showSidebar, setShowSidebar] = useState(false);
   const [filteredErrors, setFilteredErrors] = useState<ErrorCode[]>([]);
 
@@ -40,8 +41,8 @@ const Home = () => {
     }
     
     // Filter by search query
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
+    if (localSearchQuery) {
+      const lowerQuery = localSearchQuery.toLowerCase();
       filtered = filtered.filter(error => 
         error.code.toLowerCase().includes(lowerQuery) ||
         error.description.toLowerCase().includes(lowerQuery) ||
@@ -50,10 +51,11 @@ const Home = () => {
     }
     
     setFilteredErrors(filtered);
-  }, [errorCodes, selectedErrorType, searchQuery]);
+  }, [errorCodes, selectedErrorType, localSearchQuery]);
 
   const handleSearch = (query: string) => {
-    // This is handled by the context
+    setLocalSearchQuery(query);
+    setSearchQuery(query);
   };
 
   const toggleSidebar = () => {
@@ -79,7 +81,7 @@ const Home = () => {
       <main className="flex-1 flex flex-col min-h-screen">
         <MobileHeader toggleSidebar={toggleSidebar} />
         
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearch={handleSearch} initialQuery={localSearchQuery} />
         
         <section className="flex-1 p-4 md:p-6 max-w-4xl mx-auto w-full pb-20 md:pb-6">
           <div className="mb-4">
@@ -125,6 +127,8 @@ const Home = () => {
               <button 
                 onClick={() => {
                   // Reset filters and search
+                  setLocalSearchQuery('');
+                  setSearchQuery('');
                 }}
                 className="mt-4 inline-flex items-center px-4 py-2 border border-primary-500 text-primary-600 bg-white rounded-md hover:bg-primary-50 text-sm font-medium"
               >

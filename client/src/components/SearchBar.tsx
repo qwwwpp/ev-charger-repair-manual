@@ -1,28 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAppContext } from "@/lib/context";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  initialQuery?: string;
 }
 
-const SearchBar = ({ onSearch }: SearchBarProps) => {
-  const { translate, searchQuery, setSearchQuery } = useAppContext();
+const SearchBar = ({ onSearch, initialQuery = "" }: SearchBarProps) => {
+  const { translate } = useAppContext();
+  const [inputValue, setInputValue] = useState<string>(initialQuery);
   const [quickSearches] = useState<string[]>(['3009', '过温', '急停', '通讯故障']);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     console.log('Search input value:', value);
-    setSearchQuery(value);
+    setInputValue(value);
     onSearch(value);
   };
 
   const clearSearch = () => {
-    setSearchQuery('');
+    setInputValue('');
     onSearch('');
   };
 
   const handleQuickSearch = (term: string) => {
-    setSearchQuery(term);
+    setInputValue(term);
     onSearch(term);
   };
 
@@ -33,7 +35,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
           <input 
             type="text" 
             placeholder={translate('search_placeholder')}
-            value={searchQuery}
+            value={inputValue}
             onChange={handleSearchChange}
             className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50"
           />
@@ -41,7 +43,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
             <span className="material-icons text-gray-500">search</span>
           </div>
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-            {searchQuery && (
+            {inputValue && (
               <button 
                 className="text-gray-400 hover:text-gray-600" 
                 onClick={clearSearch}
