@@ -4,7 +4,11 @@ import {
   type InsertUser, 
   type ErrorCode, 
   type RepairStep, 
-  type ErrorWithSteps
+  type ErrorWithSteps,
+  type VideoTutorial,
+  type InsertVideoTutorial,
+  type ErrorCodeVideoLink,
+  type InsertErrorCodeVideoLink
 } from "@shared/schema";
 
 export interface IStorage {
@@ -25,6 +29,17 @@ export interface IStorage {
   getRepairStepById(id: number): Promise<RepairStep | undefined>;
   getRepairStepsByErrorCodeId(errorCodeId: number): Promise<RepairStep[]>;
   
+  // Video tutorial methods
+  addVideoTutorial(tutorial: Omit<VideoTutorial, "id">): Promise<VideoTutorial>;
+  getVideoTutorialById(id: number): Promise<VideoTutorial | undefined>;
+  getAllVideoTutorials(): Promise<VideoTutorial[]>;
+  getVideoTutorialsByCategory(categoryId: number): Promise<VideoTutorial[]>;
+  searchVideoTutorials(query: string): Promise<VideoTutorial[]>;
+  
+  // Error code video link methods
+  addErrorCodeVideoLink(link: Omit<ErrorCodeVideoLink, "id">): Promise<ErrorCodeVideoLink>;
+  getVideoTutorialsByErrorCodeId(errorCodeId: number): Promise<VideoTutorial[]>;
+  
   // Advanced queries
   getErrorWithSteps(errorCodeId: number): Promise<ErrorWithSteps | undefined>;
 }
@@ -33,17 +48,25 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private errorCodes: Map<number, ErrorCode>;
   private repairSteps: Map<number, RepairStep>;
+  private videoTutorials: Map<number, VideoTutorial>;
+  private errorCodeVideoLinks: Map<number, ErrorCodeVideoLink>;
   private userIdCounter: number;
   private errorCodeIdCounter: number;
   private repairStepIdCounter: number;
+  private videoTutorialIdCounter: number;
+  private errorCodeVideoLinkIdCounter: number;
 
   constructor() {
     this.users = new Map();
     this.errorCodes = new Map();
     this.repairSteps = new Map();
+    this.videoTutorials = new Map();
+    this.errorCodeVideoLinks = new Map();
     this.userIdCounter = 1;
     this.errorCodeIdCounter = 1;
     this.repairStepIdCounter = 1;
+    this.videoTutorialIdCounter = 1;
+    this.errorCodeVideoLinkIdCounter = 1;
   }
 
   // User methods
@@ -120,6 +143,58 @@ export class MemStorage implements IStorage {
     );
   }
   
+  // Video tutorial methods
+  async addVideoTutorial(tutorial: Omit<VideoTutorial, "id">): Promise<VideoTutorial> {
+    const id = this.videoTutorialIdCounter++;
+    const newTutorial: VideoTutorial = { ...tutorial, id };
+    this.videoTutorials.set(id, newTutorial);
+    return newTutorial;
+  }
+  
+  async getVideoTutorialById(id: number): Promise<VideoTutorial | undefined> {
+    return this.videoTutorials.get(id);
+  }
+  
+  async getAllVideoTutorials(): Promise<VideoTutorial[]> {
+    return Array.from(this.videoTutorials.values());
+  }
+  
+  async getVideoTutorialsByCategory(categoryId: number): Promise<VideoTutorial[]> {
+    return Array.from(this.videoTutorials.values()).filter(
+      (tutorial) => tutorial.categoryId === categoryId
+    );
+  }
+  
+  async searchVideoTutorials(query: string): Promise<VideoTutorial[]> {
+    const lowerQuery = query.toLowerCase();
+    return Array.from(this.videoTutorials.values()).filter(
+      (tutorial) => 
+        tutorial.title.toLowerCase().includes(lowerQuery) ||
+        tutorial.description.toLowerCase().includes(lowerQuery)
+    );
+  }
+  
+  // Error code video link methods
+  async addErrorCodeVideoLink(link: Omit<ErrorCodeVideoLink, "id">): Promise<ErrorCodeVideoLink> {
+    const id = this.errorCodeVideoLinkIdCounter++;
+    const newLink: ErrorCodeVideoLink = { ...link, id };
+    this.errorCodeVideoLinks.set(id, newLink);
+    return newLink;
+  }
+  
+  async getVideoTutorialsByErrorCodeId(errorCodeId: number): Promise<VideoTutorial[]> {
+    // Find all links for this error code
+    const links = Array.from(this.errorCodeVideoLinks.values())
+      .filter((link) => link.errorCodeId === errorCodeId);
+    
+    // Get the video tutorials for these links
+    const tutorials = links.map((link) => 
+      this.videoTutorials.get(link.videoTutorialId)
+    ).filter((tutorial): tutorial is VideoTutorial => tutorial !== undefined);
+    
+    return tutorials;
+  }
+  
   // Advanced queries
   async getErrorWithSteps(errorCodeId: number): Promise<ErrorWithSteps | undefined> {
     const errorCode = await this.getErrorCodeById(errorCodeId);
@@ -129,10 +204,12 @@ export class MemStorage implements IStorage {
     }
     
     const steps = await this.getRepairStepsByErrorCodeId(errorCodeId);
+    const videoTutorials = await this.getVideoTutorialsByErrorCodeId(errorCodeId);
     
     return {
       ...errorCode,
-      steps
+      steps,
+      videoTutorials
     };
   }
 }

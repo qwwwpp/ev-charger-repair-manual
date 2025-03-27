@@ -1,7 +1,8 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAppContext } from "@/lib/context";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ErrorType, ErrorTypeStats } from "@/lib/types";
+import { Video } from "lucide-react";
 
 interface SidebarProps {
   errorStats: ErrorTypeStats;
@@ -9,6 +10,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ errorStats }: SidebarProps) => {
   const { translate, language, setLanguage, selectedErrorType, setSelectedErrorType } = useAppContext();
+  const [location] = useLocation();
 
   const toggleLanguage = () => {
     setLanguage(language === 'zh' ? 'en' : 'zh');
@@ -113,6 +115,24 @@ export const Sidebar = ({ errorStats }: SidebarProps) => {
                 {errorStats['车辆异常']}
               </span>
             </button>
+          </li>
+        </ul>
+        
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">
+          {translate('video_tutorials')}
+        </h2>
+        <ul className="space-y-1">
+          <li>
+            <Link href="/videos">
+              <div className={`w-full flex items-center px-3 py-2 text-sm rounded-md ${
+                location === '/videos' 
+                  ? 'bg-primary-50 text-primary-700 font-medium' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}>
+                <Video className="w-4 h-4 mr-2" />
+                {translate('all_videos')}
+              </div>
+            </Link>
           </li>
         </ul>
       </div>

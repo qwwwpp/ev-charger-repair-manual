@@ -26,6 +26,22 @@ export const repairSteps = pgTable("repair_steps", {
   notes: text("notes"),
 });
 
+export const videoTutorials = pgTable("video_tutorials", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  url: text("url").notNull(),
+  thumbnailUrl: text("thumbnail_url"),
+  duration: text("duration"),
+  categoryId: integer("category_id"),
+});
+
+export const errorCodeVideoLinks = pgTable("error_code_video_links", {
+  id: serial("id").primaryKey(),
+  errorCodeId: integer("error_code_id").notNull(),
+  videoTutorialId: integer("video_tutorial_id").notNull(),
+});
+
 // Schema Validation
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -40,6 +56,14 @@ export const insertRepairStepSchema = createInsertSchema(repairSteps).omit({
   id: true,
 });
 
+export const insertVideoTutorialSchema = createInsertSchema(videoTutorials).omit({
+  id: true,
+});
+
+export const insertErrorCodeVideoLinkSchema = createInsertSchema(errorCodeVideoLinks).omit({
+  id: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -50,7 +74,14 @@ export type ErrorCode = typeof errorCodes.$inferSelect;
 export type InsertRepairStep = z.infer<typeof insertRepairStepSchema>;
 export type RepairStep = typeof repairSteps.$inferSelect;
 
+export type InsertVideoTutorial = z.infer<typeof insertVideoTutorialSchema>;
+export type VideoTutorial = typeof videoTutorials.$inferSelect;
+
+export type InsertErrorCodeVideoLink = z.infer<typeof insertErrorCodeVideoLinkSchema>;
+export type ErrorCodeVideoLink = typeof errorCodeVideoLinks.$inferSelect;
+
 // Additional Types for API
 export type ErrorWithSteps = ErrorCode & {
   steps?: RepairStep[];
+  videoTutorials?: VideoTutorial[];
 };

@@ -75,6 +75,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error('Error loading CSV file:', error);
   }
 
+  // Add sample video tutorials
+  // This would normally come from a database, but for this example we'll add some sample data
+  const addSampleVideoTutorials = async () => {
+    // Create sample videos
+    const video1 = await storage.addVideoTutorial({
+      title: "充电枪过温故障维修指南",
+      description: "详细演示如何诊断和修复充电枪过温故障的完整流程。",
+      url: "https://example.com/videos/charger-overtemp-repair.mp4",
+      thumbnailUrl: "https://example.com/thumbnails/charger-overtemp.jpg",
+      duration: "8:45",
+      categoryId: 1
+    });
+    
+    const video2 = await storage.addVideoTutorial({
+      title: "通信中断故障排除",
+      description: "本视频展示如何解决充电桩与车辆间通信中断的问题",
+      url: "https://example.com/videos/comm-interruption.mp4",
+      thumbnailUrl: "https://example.com/thumbnails/comm-interruption.jpg",
+      duration: "12:20",
+      categoryId: 2
+    });
+    
+    const video3 = await storage.addVideoTutorial({
+      title: "充电接口清洁与维护",
+      description: "定期维护充电接口的正确方法，避免接触不良故障",
+      url: "https://example.com/videos/connector-maintenance.mp4",
+      thumbnailUrl: "https://example.com/thumbnails/connector-maintenance.jpg",
+      duration: "5:15",
+      categoryId: 3
+    });
+    
+    // Link videos to error codes
+    // Find the error codes by their code values
+    const errorCode3009 = await storage.getErrorCodeByCode("3009");
+    const errorCode4002 = await storage.getErrorCodeByCode("4002");
+    const errorCode5001 = await storage.getErrorCodeByCode("5001");
+    
+    if (errorCode3009) {
+      await storage.addErrorCodeVideoLink({
+        errorCodeId: errorCode3009.id,
+        videoTutorialId: video1.id
+      });
+    }
+    
+    if (errorCode4002) {
+      await storage.addErrorCodeVideoLink({
+        errorCodeId: errorCode4002.id,
+        videoTutorialId: video2.id
+      });
+    }
+    
+    if (errorCode5001) {
+      await storage.addErrorCodeVideoLink({
+        errorCodeId: errorCode5001.id,
+        videoTutorialId: video3.id
+      });
+    }
+    
+    console.log('Added sample video tutorials');
+  };
+  
+  // Call the function to add sample data
+  await addSampleVideoTutorials();
+
   // API Routes
   app.get('/api/errors', async (req, res) => {
     try {
@@ -94,13 +158,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Error code not found' });
       }
       
-      // Get repair steps if available
-      const steps = await storage.getRepairStepsByErrorCodeId(error.id);
+      // Get complete error info with steps and videos
+      const errorWithDetails = await storage.getErrorWithSteps(error.id);
       
-      res.json({
-        ...error,
-        steps
-      });
+      res.json(errorWithDetails);
     } catch (error) {
       res.status(500).json({ message: 'Failed to retrieve error code details' });
     }
@@ -135,6 +196,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(results);
     } catch (error) {
       res.status(500).json({ message: 'Search failed' });
+    }
+  });
+  
+  // Video tutorial endpoints
+  app.get('/api/videos', async (req, res) => {
+    try {
+      const videos = await storage.getAllVideoTutorials();
+      res.json(videos);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to retrieve video tutorials' });
+    }
+  });
+  
+  app.get('/api/videos/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const video = await storage.getVideoTutorialById(id);
+      
+      if (!video) {
+        return res.status(404).json({ message: 'Video tutorial not found' });
+      }
+      
+      res.json(video);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to retrieve video tutorial' });
+    }
+  });
+  
+  app.get('/api/videos/search', async (req, res) => {
+    try {
+      const { q } = req.query;
+      
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ message: 'Search query required' });
+      }
+      
+      const results = await storage.searchVideoTutorials(q);
+      res.json(results);
+    } catch (error) {
+      res.status(500).json({ message: 'Video search failed' });
+    }
+  });
+  
+  app.get('/api/errors/:errorId/videos', async (req, res) => {
+    try {
+      const errorId = parseInt(req.params.errorId);
+      const videos = await storage.getVideoTutorialsByErrorCodeId(errorId);
+      res.json(videos);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to retrieve videos for error code' });
     }
   });
 

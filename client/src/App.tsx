@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import ErrorDetail from "@/pages/ErrorDetail";
+import VideoTutorials from "@/pages/VideoTutorials";
 import { useAppContext } from "./lib/context";
 
 function Router() {
@@ -10,6 +11,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/error/:code" component={ErrorDetail} />
+      <Route path="/videos" component={VideoTutorials} />
       <Route component={NotFound} />
     </Switch>
   );

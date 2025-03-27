@@ -2,6 +2,16 @@ export type Language = 'zh' | 'en';
 
 export type ErrorType = '常规停止' | '设备异常' | '车辆异常' | '';
 
+export interface VideoTutorial {
+  id: number;
+  title: string;
+  description: string;
+  url: string;
+  thumbnailUrl?: string;
+  duration?: string;
+  categoryId?: number;
+}
+
 export interface ErrorCode {
   id: number;
   code: string;
@@ -10,6 +20,7 @@ export interface ErrorCode {
   cause: string;
   solution: string;
   steps?: RepairStep[];
+  videoTutorials?: VideoTutorial[];
 }
 
 export interface RepairStep {

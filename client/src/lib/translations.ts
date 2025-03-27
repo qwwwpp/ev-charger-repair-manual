@@ -27,6 +27,12 @@ interface TranslationMap {
   search: string;
   favorites: string;
   settings: string;
+  video_tutorials: string;
+  related_videos: string;
+  video_duration: string;
+  watch_video: string;
+  no_videos: string;
+  all_videos: string;
   [key: string]: string; // Allow string indexing for dynamic keys
 }
 
@@ -64,7 +70,13 @@ export const translations: Translations = {
     home: '首页',
     search: '搜索',
     favorites: '收藏',
-    settings: '设置'
+    settings: '设置',
+    video_tutorials: '视频教程',
+    related_videos: '相关视频教程',
+    video_duration: '时长',
+    watch_video: '观看视频',
+    no_videos: '暂无相关视频',
+    all_videos: '查看所有视频教程'
   },
   en: {
     app_title: 'EV Charger Repair Manual',
@@ -93,6 +105,12 @@ export const translations: Translations = {
     home: 'Home',
     search: 'Search',
     favorites: 'Favorites',
-    settings: 'Settings'
+    settings: 'Settings',
+    video_tutorials: 'Video Tutorials',
+    related_videos: 'Related Video Tutorials',
+    video_duration: 'Duration',
+    watch_video: 'Watch Video',
+    no_videos: 'No Videos Available',
+    all_videos: 'View All Tutorials'
   }
 };

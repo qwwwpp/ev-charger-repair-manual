@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import Sidebar from "@/components/Sidebar";
 import MobileHeader from "@/components/MobileHeader";
 import MobileNav from "@/components/MobileNav";
 import ErrorCard from "@/components/ErrorCard";
+import RelatedVideos from "@/components/RelatedVideos";
 import { useAppContext } from "@/lib/context";
-import { ErrorCode, ErrorTypeStats } from "@/lib/types";
+import { ErrorCode, ErrorTypeStats, VideoTutorial } from "@/lib/types";
 
 const ErrorDetail = () => {
   const [, params] = useRoute("/error/:code");
@@ -24,6 +25,12 @@ const ErrorDetail = () => {
   const { data: error, isLoading } = useQuery<ErrorCode>({
     queryKey: [`/api/errors/${errorCode}`],
     enabled: !!errorCode,
+  });
+  
+  // Fetch related videos for this error code
+  const { data: relatedVideos = [] } = useQuery<VideoTutorial[]>({
+    queryKey: [`/api/errors/${error?.id}/videos`],
+    enabled: !!error?.id,
   });
 
   // Calculate error type statistics
@@ -81,7 +88,10 @@ const ErrorDetail = () => {
               </div>
             </div>
           ) : error ? (
-            <ErrorCard error={error} isExpanded={true} />
+            <>
+              <ErrorCard error={error} isExpanded={true} />
+              <RelatedVideos videos={relatedVideos} errorCodeId={error.id} />
+            </>
           ) : (
             <div className="text-center py-12">
               <div className="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
